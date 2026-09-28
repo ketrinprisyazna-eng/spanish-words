@@ -44,8 +44,13 @@
       if (data.HISTORY) { HISTORY = data.HISTORY; saveJSON(LS_HISTORY, HISTORY); }
       if (data.STREAK) { STREAK = data.STREAK; saveJSON(LS_STREAK, STREAK); }
       if (data.DIRECTION) { DIRECTION = data.DIRECTION; saveJSON(LS_DIRECTION, DIRECTION); }
-      const activeView = document.querySelector(".view.active");
-      if (activeView) showView(activeView.id.replace("view-", ""));
+      // Данные уже сохранены в PROGRESS/HISTORY/localStorage выше. Перерисовывать экран
+      // нужно, только если DOM уже готов — иначе (гонка на самой первой загрузке страницы)
+      // app.js сам отрисует актуальные данные через DOMContentLoaded/showView("home").
+      if (document.readyState !== "loading") {
+        const activeView = document.querySelector(".view.active");
+        if (activeView) showView(activeView.id.replace("view-", ""));
+      }
     } finally {
       applyingRemote = false;
     }
