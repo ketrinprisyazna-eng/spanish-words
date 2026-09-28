@@ -636,7 +636,12 @@ function highlightUnknown(text) {
 
 function renderTexts() {
   const el = document.getElementById("texts-list");
-  el.innerHTML = TEXTS_DATA.map((t, i) => {
+  const generateCard = `<div class="assoc-request" style="margin-bottom:14px;">
+    Тексты выше — готовый набор. Хочешь новый текст, составленный именно из твоих последних выученных слов (включая добавленные сегодня)?
+    Напиши мне в чате: <b>«сделай новый текст с моими последними словами»</b> — и я подберу короткий текст на испанском с переводом под твой текущий словарь.
+    <button class="small-btn" onclick="copyGenerateTextPrompt(this)">📋 Скопировать запрос</button>
+  </div>`;
+  const cards = TEXTS_DATA.map((t, i) => {
     const pct = textKnownPct(t.es);
     return `<div class="text-card" onclick="openText(${i})">
       <div class="title">${escapeHtml(t.title)}</div>
@@ -644,8 +649,18 @@ function renderTexts() {
       <div class="pct">Известно слов: ${pct}%</div>
     </div>`;
   }).join("");
+  el.innerHTML = generateCard + cards;
   document.getElementById("text-reader").style.display = "none";
   document.getElementById("texts-list").style.display = "block";
+}
+function copyGenerateTextPrompt(btn) {
+  const text = "сделай новый текст с моими последними словами";
+  const done = () => { const old = btn.textContent; btn.textContent = "✅ Скопировано"; setTimeout(() => { btn.textContent = old; }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => alert(text));
+  } else {
+    alert(text);
+  }
 }
 function openText(i) {
   currentTextIdx = i;

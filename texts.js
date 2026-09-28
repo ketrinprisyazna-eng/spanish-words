@@ -61,5 +61,11 @@ const TEXTS_DATA = [
     theme: "Разговор",
     es: "¡Hola! ¿Cómo estás? Me llamo Ana, soy de España y soy profesora. Tengo veinticinco años. ¿Y tú, cómo te llamas? ¿De dónde eres? Mucho gusto en conocerte. Si quieres, podemos tomar un café mañana y hablar más. ¡Hasta luego!",
     ru: "Привет! Как дела? Меня зовут Анна, я из Испании, я учительница. Мне двадцать пять лет. А ты, как тебя зовут? Откуда ты? Очень приятно познакомиться. Если хочешь, можем завтра выпить кофе и поговорить ещё. До скорого!"
+  },
+  {
+    title: "Удачный день",
+    theme: "Развлечения",
+    es: "Ayer tuve mucha suerte. Mi jefe me dio dos entradas para ver a un bailarín famoso. Antes del espectáculo caminamos por un parque con muchas plantas y vimos varios insectos interesantes. Compré un mango dulce para comer de camino a casa. ¡Fue un día perfecto!",
+    ru: "Вчера мне очень повезло. Мой начальник дал мне два билета на выступление известного танцора. Перед представлением мы гуляли по парку с множеством растений и видели несколько интересных насекомых. Я купила сладкое манго, чтобы съесть по дороге домой. Это был идеальный день!"
   }
 ];
