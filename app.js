@@ -291,8 +291,8 @@ function showView(name) {
 
 /* ============ Главная ============ */
 function renderHome() {
-  const masteredForPct = countMastered();
-  const progressPct = WORDS_DATA.length ? Math.round((masteredForPct / WORDS_DATA.length) * 100) : 0;
+  const passedForPct = countMastered() + countLearning();
+  const progressPct = WORDS_DATA.length ? Math.round((passedForPct / WORDS_DATA.length) * 100) : 0;
   document.getElementById("stat-progress-pct").textContent = progressPct + "%";
   const t = HISTORY[todayStr()] || { reviewed: 0, correct: 0 };
   document.getElementById("stat-today").textContent = t.reviewed;
