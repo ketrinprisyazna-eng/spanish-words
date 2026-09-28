@@ -869,6 +869,25 @@ function renderReader() {
     ? micButtonHtml(t.es, "reader-mic-btn") + `<span class="reader-mic-label">Прочитай текст вслух и проверь произношение</span>`
     : "";
   document.getElementById("reader-meta").textContent = currentTextLang === "es" ? `Известно слов в тексте: ${pct}% (выделены слова, которых ещё нет в твоём наборе)` : "";
+  const box = document.getElementById("reader-translate-box");
+  box.style.display = "none";
+  box.innerHTML = "";
+  document.getElementById("reader-translate-btn").textContent = "🌐 Перевести текст";
+}
+function toggleReaderTranslation() {
+  const t = currentGeneratedText;
+  if (!t) return;
+  const box = document.getElementById("reader-translate-box");
+  const btn = document.getElementById("reader-translate-btn");
+  const showing = box.style.display !== "none";
+  if (showing) {
+    box.style.display = "none";
+    btn.textContent = "🌐 Перевести текст";
+  } else {
+    box.textContent = currentTextLang === "es" ? t.ru : t.es;
+    box.style.display = "block";
+    btn.textContent = "🌐 Скрыть перевод";
+  }
 }
 function regenerateText() {
   currentGeneratedText = null;

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Испанские слова — повторение</title>
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <div id="app">
@@ -120,7 +120,9 @@
       <div class="word-translate-popup" id="word-translate-popup" style="display:none;"></div>
       <div class="reader-mic" id="reader-mic"></div>
       <div class="reader-meta" id="reader-meta"></div>
-      <button class="small-btn" style="margin-top:14px;" onclick="regenerateText()">🔄 Другой текст</button>
+      <button class="small-btn learn-btn" style="margin-top:14px;" onclick="toggleReaderTranslation()" id="reader-translate-btn">🌐 Перевести текст</button>
+      <div class="reader-translate-box" id="reader-translate-box" style="display:none;"></div>
+      <button class="small-btn" style="margin-top:10px;" onclick="regenerateText()">🔄 Другой текст</button>
     </div>
   </div>
 
@@ -178,7 +180,7 @@
 <script src="assoc.js?v=2"></script>
 <script src="duo.js?v=2"></script>
 <script src="mic.js?v=3"></script>
-<script src="app.js?v=16"></script>
+<script src="app.js?v=17"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
