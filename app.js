@@ -511,6 +511,7 @@ function renderWords() {
         <div class="ru">${escapeHtml(w.ru)}</div>
       </div>
       <div class="box-dots">${dots}</div>
+      ${micButtonHtml(w.es)}
       <button class="assoc-btn" onclick="openAssocFor('${encodeURIComponent(w.es)}')">🧠</button>
     </div>`;
   }).join("");
@@ -669,6 +670,9 @@ function renderReader() {
   document.getElementById("lang-ru-btn").classList.toggle("active", currentTextLang === "ru");
   const body = currentTextLang === "es" ? highlightUnknown(t.es) : escapeHtml(t.ru);
   document.getElementById("reader-body").innerHTML = body;
+  document.getElementById("reader-mic").innerHTML = currentTextLang === "es"
+    ? micButtonHtml(t.es, "reader-mic-btn") + `<span class="reader-mic-label">Прочитай текст вслух и проверь произношение</span>`
+    : "";
   document.getElementById("reader-meta").textContent = currentTextLang === "es" ? `Известно слов в тексте: ${pct}% (выделены слова, которых ещё нет в твоём наборе)` : "";
 }
 

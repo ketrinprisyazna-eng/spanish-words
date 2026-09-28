@@ -158,4 +158,16 @@ const DUO_LOG = [
       },
     ],
   },
+  {
+    id: "2026-09-28b",
+    date: "2026-09-28",
+    lessons: [
+      { skill: "Используйте косвенные местоимения", module: "Модуль 3, Раздел 18 (индивидуальные уроки)", lessonNum: "Урок 1 из 3", correct: 10, total: 10, perfect: true },
+      { skill: "Используйте косвенные местоимения", module: "Модуль 3, Раздел 18 (индивидуальные уроки)", lessonNum: "Урок 2 из 3", correct: 12, total: 13, perfect: false },
+      { skill: "Используйте косвенные местоимения", module: "Модуль 3, Раздел 18 (индивидуальные уроки)", lessonNum: "Урок 3 из 3", correct: 15, total: 15, perfect: true },
+      { skill: "Используйте косвенные местоимения", module: "Модуль 3, Раздел 18", lessonNum: "Раздел 18 полностью завершён (индивидуальные уроки пройдены, предложен и пропущен Легендарный уровень)" },
+    ],
+    newWords: ["plantas", "mango", "bailarín", "famoso", "jefe", "insectos", "suerte", "entradas", "chilenas"],
+    rules: [],
+  },
 ];
