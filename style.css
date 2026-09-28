@@ -211,6 +211,7 @@ textarea { resize: vertical; min-height: 64px; }
   width: 100%; max-width: 440px; padding: 14px; border: none; border-radius: 14px;
   background: var(--primary); color: white; font-weight: 700; font-size: 15px; cursor: pointer;
 }
+.reveal-btn:disabled { opacity: .6; cursor: default; }
 .reveal-btn.ghost {
   background: none; color: var(--muted); border: 1px solid var(--border);
   padding: 10px; font-size: 13px; font-weight: 600;

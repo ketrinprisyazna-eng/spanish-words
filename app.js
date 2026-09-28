@@ -604,9 +604,11 @@ function openAssocFor(esEnc) {
   renderAssocList();
 }
 
-/* ============ Тексты ============ */
-let currentTextIdx = null;
+/* ============ Тексты (генерируются ИИ по запросу) ============ */
+const LS_AI_KEY = "esapp_ai_key";
+let currentGeneratedText = null;
 let currentTextLang = "es";
+let genLang = "es";
 
 function knownSet() {
   const s = new Set();
@@ -637,51 +639,93 @@ function highlightUnknown(text) {
   }).join("");
 }
 
-function renderTexts() {
-  const el = document.getElementById("texts-list");
-  const generateCard = `<div class="assoc-request" style="margin-bottom:14px;">
-    Тексты выше — готовый набор. Хочешь новый текст, составленный именно из твоих последних выученных слов (включая добавленные сегодня)?
-    Напиши мне в чате: <b>«сделай новый текст с моими последними словами»</b> — и я подберу короткий текст на испанском с переводом под твой текущий словарь.
-    <button class="small-btn" onclick="copyGenerateTextPrompt(this)">📋 Скопировать запрос</button>
-  </div>`;
-  const cards = TEXTS_DATA.map((t, i) => {
-    const pct = textKnownPct(t.es);
-    return `<div class="text-card" onclick="openText(${i})">
-      <div class="title">${escapeHtml(t.title)}</div>
-      <div class="theme">${escapeHtml(t.theme)}</div>
-      <div class="pct">Известно слов: ${pct}%</div>
-    </div>`;
-  }).join("");
-  el.innerHTML = generateCard + cards;
-  document.getElementById("text-reader").style.display = "none";
-  document.getElementById("texts-list").style.display = "block";
+function loadAiKey() { return (localStorage.getItem(LS_AI_KEY) || "").trim(); }
+function saveAiKey() {
+  const input = document.getElementById("ai-key-input");
+  const key = input.value.trim();
+  if (!key) return;
+  localStorage.setItem(LS_AI_KEY, key);
+  input.value = "";
+  renderTexts();
 }
-function copyGenerateTextPrompt(btn) {
-  const text = "сделай новый текст с моими последними словами";
-  const done = () => { const old = btn.textContent; btn.textContent = "✅ Скопировано"; setTimeout(() => { btn.textContent = old; }, 1500); };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(done).catch(() => alert(text));
+function clearAiKey() {
+  localStorage.removeItem(LS_AI_KEY);
+  renderTexts();
+}
+function setGenLang(lang) {
+  genLang = lang;
+  document.querySelectorAll("#gen-lang-toggle .filter-chip").forEach((el) => el.classList.toggle("active", el.dataset.lang === lang));
+}
+function sampleVocabForPrompt(n) {
+  const pool = WORDS_DATA.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  return pool.slice(0, n).map((w) => w.es);
+}
+function renderTexts() {
+  const key = loadAiKey();
+  document.getElementById("ai-key-card").style.display = key ? "none" : "block";
+  document.getElementById("ai-key-status").textContent = key ? "Ключ сохранён в этом браузере." : "";
+  if (currentGeneratedText) {
+    document.getElementById("texts-generate").style.display = "none";
+    document.getElementById("text-reader").style.display = "block";
+    renderReader();
   } else {
-    alert(text);
+    document.getElementById("texts-generate").style.display = "block";
+    document.getElementById("text-reader").style.display = "none";
   }
 }
-function openText(i) {
-  currentTextIdx = i;
-  currentTextLang = "es";
-  document.getElementById("texts-list").style.display = "none";
-  document.getElementById("text-reader").style.display = "block";
-  renderReader();
+async function generateNewText() {
+  const key = loadAiKey();
+  if (!key) { alert("Сначала вставь и сохрани ключ ИИ выше."); return; }
+  const btn = document.getElementById("generate-text-btn");
+  const oldLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "⏳ Генерирую...";
+  const words = sampleVocabForPrompt(55);
+  const prompt = `Ты помощник для изучения испанского языка. Составь короткий текст (4-6 предложений, уровень A2, простая грамматика) на испанском языке, используя как можно больше следующих слов и фраз из словаря ученика: ${words.join(", ")}. Тема свободная и естественная, текст связный.
+Ответь СТРОГО в формате JSON без markdown-разметки и пояснений, ровно так:
+{"title": "короткое название на русском", "es": "текст на испанском", "ru": "точный перевод текста на русский"}`;
+  try {
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => "");
+      throw new Error(`Сервер ответил ошибкой ${resp.status}. ${errText.slice(0, 200)}`);
+    }
+    const data = await resp.json();
+    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    if (!parsed.es || !parsed.ru) throw new Error("Не удалось разобрать ответ ИИ.");
+    currentGeneratedText = { title: parsed.title || "Новый текст", es: parsed.es, ru: parsed.ru };
+    currentTextLang = genLang;
+    document.getElementById("texts-generate").style.display = "none";
+    document.getElementById("text-reader").style.display = "block";
+    renderReader();
+  } catch (e) {
+    alert("Не получилось сгенерировать текст: " + e.message + "\n\nПроверь ключ (в начале раздела «Тексты») и соединение с интернетом.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldLabel;
+  }
 }
 function closeReader() {
   document.getElementById("text-reader").style.display = "none";
-  document.getElementById("texts-list").style.display = "block";
+  document.getElementById("texts-generate").style.display = "block";
 }
 function setTextLang(lang) {
   currentTextLang = lang;
   renderReader();
 }
 function renderReader() {
-  const t = TEXTS_DATA[currentTextIdx];
+  const t = currentGeneratedText;
+  if (!t) return;
   const pct = textKnownPct(t.es);
   document.getElementById("reader-title").textContent = t.title;
   document.getElementById("lang-es-btn").classList.toggle("active", currentTextLang === "es");
@@ -692,6 +736,11 @@ function renderReader() {
     ? micButtonHtml(t.es, "reader-mic-btn") + `<span class="reader-mic-label">Прочитай текст вслух и проверь произношение</span>`
     : "";
   document.getElementById("reader-meta").textContent = currentTextLang === "es" ? `Известно слов в тексте: ${pct}% (выделены слова, которых ещё нет в твоём наборе)` : "";
+}
+function regenerateText() {
+  currentGeneratedText = null;
+  document.getElementById("text-reader").style.display = "none";
+  document.getElementById("texts-generate").style.display = "block";
 }
 
 /* ============ Учёба из DUO ============ */
