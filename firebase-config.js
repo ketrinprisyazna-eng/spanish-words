@@ -21,10 +21,10 @@
    локально, просто без синхронизации между устройствами.
 */
 window.FIREBASE_CONFIG = {
-  apiKey: "ВСТАВЬ_СЮДА",
-  authDomain: "ВСТАВЬ_СЮДА.firebaseapp.com",
-  projectId: "ВСТАВЬ_СЮДА",
-  storageBucket: "ВСТАВЬ_СЮДА.appspot.com",
-  messagingSenderId: "ВСТАВЬ_СЮДА",
-  appId: "ВСТАВЬ_СЮДА",
+  apiKey: "AIzaSyDSpI6d0fq4NWpX0JkVd8GEGmZztqoIGKk",
+  authDomain: "spanish-words-3e503.firebaseapp.com",
+  projectId: "spanish-words-3e503",
+  storageBucket: "spanish-words-3e503.firebasestorage.app",
+  messagingSenderId: "366045450814",
+  appId: "1:366045450814:web:6b3a56bb70b28d79d0776f",
 };
