@@ -17,6 +17,44 @@ function micButtonHtml(target, extraClass) {
   return `<button class="mic-btn ${extraClass || ""}" data-target="${escapeHtml(target)}" onclick="handleMicClick(this)" title="Проверить произношение">🎤</button>`;
 }
 
+/* Микрофон как способ ОТВЕТИТЬ в сессии повторения: распознанная речь
+   вписывается в поле ответа (type-answer-input), а не проверяется сама по себе. */
+function micAnswerButtonHtml(lang) {
+  return `<button class="mic-btn" data-lang="${lang}" onclick="handleAnswerMicClick(this)" title="Ответить голосом">🎤</button>`;
+}
+
+function handleAnswerMicClick(btn) {
+  if (!MIC_SUPPORTED) {
+    alert("Распознавание речи не поддерживается в этом браузере. Открой сайт в Chrome (на Android — работает).");
+    return;
+  }
+  const input = document.getElementById("type-answer-input");
+  if (!input) return;
+  if (micActiveBtn === btn) { stopMic(); return; }
+  if (micActiveBtn) stopMic();
+
+  const rec = new SpeechRecognitionCtor();
+  rec.lang = btn.dataset.lang || "es-ES";
+  rec.interimResults = false;
+  rec.continuous = false;
+  rec.maxAlternatives = 1;
+
+  micRecognition = rec;
+  micActiveBtn = btn;
+  btn.dataset.state = "listening";
+  btn.textContent = "🔴";
+  btn.classList.add("listening");
+
+  rec.onresult = (e) => {
+    const heard = e.results[0][0].transcript;
+    input.value = heard;
+    input.focus();
+  };
+  rec.onerror = () => { resetMicBtn(btn); };
+  rec.onend = () => { resetMicBtn(btn); };
+  try { rec.start(); } catch (e) { resetMicBtn(btn); }
+}
+
 let micActiveBtn = null;
 let micRecognition = null;
 

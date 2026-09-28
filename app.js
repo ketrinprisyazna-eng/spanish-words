@@ -394,7 +394,7 @@ function renderCard() {
   document.getElementById("flash-area").innerHTML = `
     <div class="flash-wrap">
       <div class="flashcard" id="flip-card">
-        ${micButtonHtml(w.es, "card-mic-btn")}
+        ${revealed ? micButtonHtml(targetText, "card-mic-btn") : ""}
         <div class="dir-badge">${isRuToEs ? "RU → ES" : "ES → RU"}</div>
         <div class="es-word">${escapeHtml(promptText)}</div>
         ${revealed ? `<div class="ru-word">${escapeHtml(targetText)}</div>` : ""}
@@ -404,6 +404,7 @@ function renderCard() {
       ${!revealed ? `
         <div class="type-answer-row">
           <input type="text" id="type-answer-input" class="type-answer-input" placeholder="Твой перевод..." autocomplete="off">
+          ${micAnswerButtonHtml(isRuToEs ? "es-ES" : "ru-RU")}
           <button class="check-btn" onclick="checkTyped()">Проверить</button>
         </div>
         <button class="think-btn" onclick="toggleAssocInSession()">🧠 Не могу запомнить — показать ассоциацию</button>
