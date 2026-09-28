@@ -688,6 +688,20 @@ function highlightUnknown(text) {
     return `<span class="${cls}" onclick="showWordTranslation('${encodeURIComponent(clean)}')">${escapeHtml(chunk)}</span>`;
   }).join("");
 }
+function colorReaderPronunciation(target, heard) {
+  const el = document.getElementById("reader-body");
+  if (!el) return;
+  const heardWords = new Set(normalizeForSpeech(heard).split(/\s+/).filter(Boolean));
+  el.innerHTML = target.split(/(\s+)/).map((chunk) => {
+    if (/^\s+$/.test(chunk)) return chunk;
+    const clean = chunk.toLowerCase().replace(/[¡¿.,!?;:"""'()]/g, "");
+    if (!clean) return escapeHtml(chunk);
+    const said = heardWords.has(normalizeForSpeech(clean));
+    const cls = "tap-word " + (said ? "pron-ok" : "pron-bad");
+    return `<span class="${cls}" onclick="showWordTranslation('${encodeURIComponent(clean)}')">${escapeHtml(chunk)}</span>`;
+  }).join("");
+}
+window.colorReaderPronunciation = colorReaderPronunciation;
 const LS_WORD_TRANSLATE_CACHE = "esapp_word_translate_cache_v1";
 function speakEs(text) {
   if (!window.speechSynthesis) return;

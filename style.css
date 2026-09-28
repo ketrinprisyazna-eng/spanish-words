@@ -273,6 +273,8 @@ textarea { resize: vertical; min-height: 64px; }
 .reader-body .unknown { background: var(--warn-light); border-radius: 4px; padding: 0 2px; }
 .reader-body .tap-word { cursor: pointer; border-radius: 4px; }
 .reader-body .tap-word:active { background: var(--accent-light); }
+.reader-body .pron-ok { background: var(--primary-light); }
+.reader-body .pron-bad { background: var(--danger-light); }
 .word-translate-popup {
   margin-top: 10px; padding: 10px 12px; border-radius: 12px;
   background: var(--accent-light); color: var(--text); font-size: 14px;

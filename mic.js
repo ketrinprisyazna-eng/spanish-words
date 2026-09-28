@@ -136,5 +136,8 @@ function finishMic(btn, target, heard) {
   btn.title = heard
     ? `Услышано: «${heard}»` + (target.trim().split(/\s+/).length > 1 ? ` (совпадение: ${pct}%)` : "")
     : "Не расслышал — попробуй ещё раз";
+  if (btn.classList.contains("reader-mic-btn") && typeof window.colorReaderPronunciation === "function") {
+    window.colorReaderPronunciation(target, heard);
+  }
   setTimeout(() => { if (btn.dataset.state === "idle") { btn.textContent = "🎤"; } }, 2200);
 }
