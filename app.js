@@ -684,9 +684,31 @@ function highlightUnknown(text) {
     if (/^\s+$/.test(chunk)) return chunk;
     const clean = chunk.toLowerCase().replace(/[¡¿.,!?;:"""'()]/g, "");
     if (!clean) return escapeHtml(chunk);
-    if (ks.has(clean) || STOP_WORDS.has(clean)) return escapeHtml(chunk);
-    return `<span class="unknown">${escapeHtml(chunk)}</span>`;
+    const cls = ks.has(clean) || STOP_WORDS.has(clean) ? "tap-word" : "unknown tap-word";
+    return `<span class="${cls}" onclick="showWordTranslation('${encodeURIComponent(clean)}')">${escapeHtml(chunk)}</span>`;
   }).join("");
+}
+const LS_WORD_TRANSLATE_CACHE = "esapp_word_translate_cache_v1";
+async function showWordTranslation(esEnc) {
+  const es = decodeURIComponent(esEnc);
+  const popup = document.getElementById("word-translate-popup");
+  if (!popup) return;
+  popup.style.display = "block";
+  const w = WORDS_DATA.find((x) => normKey(x.es) === es);
+  if (w) { popup.innerHTML = `<b>${escapeHtml(w.es)}</b> — ${escapeHtml(w.ru)}`; return; }
+  const cache = loadJSON(LS_WORD_TRANSLATE_CACHE, {});
+  if (cache[es]) { popup.innerHTML = `<b>${escapeHtml(es)}</b> — ${escapeHtml(cache[es])}`; return; }
+  if (!loadAiKey()) { popup.innerHTML = `<b>${escapeHtml(es)}</b> — нет в твоём словаре (вставь ключ ИИ выше, чтобы переводить и такие слова)`; return; }
+  popup.innerHTML = `<b>${escapeHtml(es)}</b> — ищу перевод...`;
+  try {
+    const raw = await callGeminiRaw(`Переведи испанское слово или короткую фразу "${es}" на русский язык одним словом или короткой фразой, в начальной форме. Ответь только переводом, без пояснений и кавычек.`);
+    const translation = raw.trim();
+    cache[es] = translation;
+    saveJSON(LS_WORD_TRANSLATE_CACHE, cache);
+    popup.innerHTML = `<b>${escapeHtml(es)}</b> — ${escapeHtml(translation)}`;
+  } catch (e) {
+    popup.innerHTML = `<b>${escapeHtml(es)}</b> — не удалось перевести (${escapeHtml(e.message)})`;
+  }
 }
 
 function loadAiKey() { return (localStorage.getItem(LS_AI_KEY) || "").trim(); }
@@ -788,6 +810,8 @@ function renderReader() {
   document.getElementById("lang-ru-btn").classList.toggle("active", currentTextLang === "ru");
   const body = currentTextLang === "es" ? highlightUnknown(t.es) : escapeHtml(t.ru);
   document.getElementById("reader-body").innerHTML = body;
+  const popup = document.getElementById("word-translate-popup");
+  if (popup) popup.style.display = "none";
   document.getElementById("reader-mic").innerHTML = currentTextLang === "es"
     ? micButtonHtml(t.es, "reader-mic-btn") + `<span class="reader-mic-label">Прочитай текст вслух и проверь произношение</span>`
     : "";

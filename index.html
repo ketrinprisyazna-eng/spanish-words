@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Испанские слова — повторение</title>
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <div id="app">
@@ -110,6 +110,7 @@
       </div>
       <h3 id="reader-title" style="margin:6px 0 12px;"></h3>
       <div class="reader-body" id="reader-body"></div>
+      <div class="word-translate-popup" id="word-translate-popup" style="display:none;"></div>
       <div class="reader-mic" id="reader-mic"></div>
       <div class="reader-meta" id="reader-meta"></div>
       <button class="small-btn" style="margin-top:14px;" onclick="regenerateText()">🔄 Другой текст</button>
@@ -170,7 +171,7 @@
 <script src="assoc.js?v=2"></script>
 <script src="duo.js?v=2"></script>
 <script src="mic.js?v=2"></script>
-<script src="app.js?v=12"></script>
+<script src="app.js?v=13"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
