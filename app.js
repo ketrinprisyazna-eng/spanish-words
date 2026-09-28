@@ -821,6 +821,35 @@ function closeReader() {
   document.getElementById("text-reader").style.display = "none";
   document.getElementById("texts-generate").style.display = "block";
 }
+async function translateOwnText() {
+  const key = loadAiKey();
+  if (!key) { alert("Сначала вставь и сохрани ключ ИИ выше."); return; }
+  const input = document.getElementById("translate-input");
+  const text = input.value.trim();
+  if (!text) return;
+  const btn = document.getElementById("translate-btn");
+  const resultEl = document.getElementById("translate-result");
+  const oldLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "⏳ Перевожу...";
+  resultEl.innerHTML = "";
+  const prompt = `Определи, на каком языке написан следующий текст — на русском или на испанском — и переведи его на другой язык (если текст на русском, переведи на испанский; если на испанском — переведи на русский). Текст: "${text}"
+Ответь СТРОГО в формате JSON без markdown-разметки и пояснений, ровно так:
+{"detected": "ru" или "es", "translation": "перевод"}`;
+  try {
+    const raw = await callGeminiRaw(prompt);
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    if (!parsed.translation) throw new Error("Пустой перевод.");
+    const dirLabel = parsed.detected === "ru" ? "RU → ES" : "ES → RU";
+    resultEl.innerHTML = `<div class="dir-badge" style="margin-top:10px;">${dirLabel}</div><div style="margin-top:6px;">${escapeHtml(parsed.translation)}</div>`;
+  } catch (e) {
+    resultEl.innerHTML = `<div style="color:var(--danger);margin-top:10px;">Не получилось перевести: ${escapeHtml(e.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = oldLabel;
+  }
+}
 function setTextLang(lang) {
   currentTextLang = lang;
   renderReader();
