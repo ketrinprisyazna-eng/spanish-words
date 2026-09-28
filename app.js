@@ -693,12 +693,13 @@ function loadAiKey() { return (localStorage.getItem(LS_AI_KEY) || "").trim(); }
 async function callGeminiRaw(prompt) {
   const key = loadAiKey();
   if (!key) throw new Error("Нет сохранённого ключа ИИ.");
-  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(key)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
   });
   if (!resp.ok) {
+    if (resp.status === 503) throw new Error("ИИ сейчас перегружен (слишком много запросов у Google). Подожди немного и попробуй ещё раз.");
     const errText = await resp.text().catch(() => "");
     throw new Error(`Сервер ответил ошибкой ${resp.status}. ${errText.slice(0, 200)}`);
   }
