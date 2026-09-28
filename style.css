@@ -187,11 +187,13 @@ textarea { resize: vertical; min-height: 64px; }
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
 }
 .flashcard {
+  position: relative;
   width: 100%; max-width: 440px; min-height: 220px; background: var(--card);
   border-radius: 22px; box-shadow: var(--shadow); display: flex; flex-direction: column;
   align-items: center; justify-content: center; padding: 28px 20px; text-align: center; gap: 14px;
   cursor: pointer;
 }
+.flashcard .card-mic-btn { position: absolute; top: 12px; right: 12px; }
 .flashcard .es-word { font-size: 30px; font-weight: 800; }
 .flashcard .ru-word { font-size: 20px; color: var(--primary-dark); font-weight: 600; }
 .flashcard .hint { font-size: 12.5px; color: var(--muted); }

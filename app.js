@@ -394,6 +394,7 @@ function renderCard() {
   document.getElementById("flash-area").innerHTML = `
     <div class="flash-wrap">
       <div class="flashcard" id="flip-card">
+        ${micButtonHtml(w.es, "card-mic-btn")}
         <div class="dir-badge">${isRuToEs ? "RU → ES" : "ES → RU"}</div>
         <div class="es-word">${escapeHtml(promptText)}</div>
         ${revealed ? `<div class="ru-word">${escapeHtml(targetText)}</div>` : ""}
@@ -469,6 +470,7 @@ function renderLearnCard() {
   document.getElementById("flash-area").innerHTML = `
     <div class="flash-wrap">
       <div class="flashcard">
+        ${micButtonHtml(w.es, "card-mic-btn")}
         <div class="dir-badge learn-badge">📖 Изучение</div>
         <div class="es-word">${escapeHtml(w.es)}</div>
         <div class="ru-word">${escapeHtml(w.ru)}</div>
