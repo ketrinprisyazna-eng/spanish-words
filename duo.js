@@ -170,4 +170,14 @@ const DUO_LOG = [
     newWords: ["plantas", "mango", "bailarín", "famoso", "jefe", "insectos", "suerte", "entradas", "chilenas"],
     rules: [],
   },
+  {
+    id: "2026-09-28c",
+    date: "2026-09-28",
+    lessons: [
+      { skill: "Используйте косвенные местоимения", module: "Модуль 3, Раздел 18 (новый цикл индивидуальных уроков)", lessonNum: "Урок 1 из 3", correct: 15, total: 15, perfect: true },
+      { skill: "Используйте косвенные местоимения", module: "Модуль 3, Раздел 18 (новый цикл индивидуальных уроков)", lessonNum: "Урок 2 из 3", perfect: false },
+    ],
+    newWords: ["esquinas", "vecina"],
+    rules: [],
+  },
 ];
