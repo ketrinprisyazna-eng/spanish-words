@@ -271,7 +271,9 @@ function showView(name) {
 
 /* ============ Главная ============ */
 function renderHome() {
-  document.getElementById("stat-streak").textContent = STREAK.streak || 0;
+  const masteredForPct = countMastered();
+  const progressPct = WORDS_DATA.length ? Math.round((masteredForPct / WORDS_DATA.length) * 100) : 0;
+  document.getElementById("stat-progress-pct").textContent = progressPct + "%";
   const t = HISTORY[todayStr()] || { reviewed: 0, correct: 0 };
   document.getElementById("stat-today").textContent = t.reviewed;
   document.getElementById("stat-due").textContent = countDue();
