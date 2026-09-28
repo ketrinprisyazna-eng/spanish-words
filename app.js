@@ -689,8 +689,18 @@ function highlightUnknown(text) {
   }).join("");
 }
 const LS_WORD_TRANSLATE_CACHE = "esapp_word_translate_cache_v1";
+function speakEs(text) {
+  if (!window.speechSynthesis) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "es-ES";
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
 async function showWordTranslation(esEnc) {
   const es = decodeURIComponent(esEnc);
+  speakEs(es);
   const popup = document.getElementById("word-translate-popup");
   if (!popup) return;
   popup.style.display = "block";
