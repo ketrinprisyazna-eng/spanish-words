@@ -78,12 +78,14 @@ function registerReview(es, correct) {
     p.box = Math.min(5, p.box + 1);
     p.fails = Math.max(0, p.fails - 1);
     if (p.box >= 2) p.difficult = false;
+    p.next = Date.now() + INTERVALS_DAYS[p.box] * 86400000;
   } else {
     p.box = Math.max(0, p.box - 1);
     p.fails += 1;
     if (p.fails >= 3) p.difficult = true;
+    // ошибка — слово возвращается в повторение не раньше следующего дня, а не сразу в новой сессии
+    p.next = Date.now() + Math.max(1, INTERVALS_DAYS[p.box]) * 86400000;
   }
-  p.next = Date.now() + INTERVALS_DAYS[p.box] * 86400000;
   saveProgress();
 }
 
@@ -141,8 +143,9 @@ function buildQueue(n) {
   };
 
   const all = WORDS_DATA.map((w) => ({ w, p: getProgress(w.es) }));
-  // слова, уже пройденные СЕГОДНЯ и без ошибки, — не повторяем до следующего дня
-  let pool = all.filter((x) => x.p.lastWrong || !seenToday(x.p));
+  // слова, уже пройденные СЕГОДНЯ (правильно или с ошибкой), — не повторяем до следующего дня;
+  // ошибки просто переходят в первый план ЗАВТРА (см. sortFn: lastWrong — первыми)
+  let pool = all.filter((x) => !seenToday(x.p));
   if (pool.length === 0) pool = all; // если все слова уже пройдены сегодня — не оставлять сессию пустой
 
   pool.sort(sortFn);
