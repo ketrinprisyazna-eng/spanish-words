@@ -239,11 +239,31 @@ function wrapWithDirections(words) {
   return words.map((w) => ({ word: w, dir: pickCardDirection() }));
 }
 
+const LS_AI_ASSOC_CACHE = "esapp_ai_assoc_cache_v1";
+function loadAiAssocCache() { return loadJSON(LS_AI_ASSOC_CACHE, {}); }
+function saveAiAssocCache(cache) { saveJSON(LS_AI_ASSOC_CACHE, cache); }
+async function generateAiAssociationFor(es, ru) {
+  const key = normKey(es);
+  const cache = loadAiAssocCache();
+  if (cache[key]) return cache[key];
+  const prompt = `Придумай запоминающуюся ассоциацию (мнемонику) на русском языке для испанского слова или фразы "${es}" (перевод: "${ru}"). Используй созвучие с русскими словами или яркий образ, в духе этих примеров:
+«ALGUIEN — начало похоже на «ГЕНий»: если гений где-то есть — значит, alguien (кто-то) точно есть в комнате.»
+«VOY — «ВОй!» — я убегаю с воем: voy = я иду/еду.»
+Ответь одним-двумя предложениями — только сама ассоциация, без вступления и без кавычек вокруг всего ответа.`;
+  const raw = await callGeminiRaw(prompt);
+  const text = raw.trim();
+  if (!text) throw new Error("Пустой ответ ИИ.");
+  cache[key] = text;
+  saveAiAssocCache(cache);
+  return text;
+}
 function getAssociation(es, ru) {
   const key = normKey(es);
   const p = getProgress(es);
   if (p.customAssoc) return { text: p.customAssoc, tag: "custom" };
   if (ASSOC_OVERRIDES[key]) return { text: ASSOC_OVERRIDES[key], tag: "ai" };
+  const aiCache = loadAiAssocCache();
+  if (aiCache[key]) return { text: aiCache[key], tag: "ai" };
   const translit = transliterateEs(es);
   const rhyme = findRhyme(translit);
   let text;
@@ -458,6 +478,14 @@ function toggleAssocInSession() {
   SESSION.showAssoc = !SESSION.showAssoc;
   if (SESSION.showAssoc && SESSION.mode !== "learn") markDifficult(currentWord().es);
   renderCard();
+  if (SESSION.showAssoc) requestBetterAssocFor(currentWord(), renderCard);
+}
+function requestBetterAssocFor(w, onImproved) {
+  const a = getAssociation(w.es, w.ru);
+  if (a.tag !== "auto" || !loadAiKey()) return;
+  generateAiAssociationFor(w.es, w.ru)
+    .then(() => { if (currentWord() && currentWord().es === w.es) onImproved(); })
+    .catch(() => {});
 }
 
 /* ============ Карточка изучения (новые слова) ============ */
@@ -557,8 +585,11 @@ function renderAssocDetail(w) {
     ${isAuto ? `
       <div class="assoc-request">
         Это черновая подсказка (просто созвучие), а не настоящая ассоциация.
-        Напиши мне в чате: <b>«сделай ассоциацию для ${escapeHtml(w.es)}»</b> — и я подберу конкретный, запоминающийся образ именно под это слово.
-        <button class="small-btn" onclick="copyWordToClipboard('${encodeURIComponent(w.es)}', this)">📋 Скопировать слово</button>
+        ${loadAiKey()
+          ? `<button class="small-btn learn-btn" onclick="generateAiAssocForList('${encodeURIComponent(w.es)}', this)">🤖 Сгенерировать ассоциацию</button>`
+          : `Вставь свой ключ ИИ в разделе «Тексты», чтобы генерировать ассоциации автоматически — или напиши мне в чате: <b>«сделай ассоциацию для ${escapeHtml(w.es)}»</b>.
+             <button class="small-btn" onclick="copyWordToClipboard('${encodeURIComponent(w.es)}', this)">📋 Скопировать слово</button>`
+        }
       </div>
     ` : ""}
     <textarea placeholder="Своя ассоциация (необязательно) — сохранится и заменит показанную выше" id="ta-${cssId(w.es)}">${escapeHtml(p.customAssoc || "")}</textarea>
@@ -567,6 +598,22 @@ function renderAssocDetail(w) {
       ${p.difficult ? `<button class="small-btn" onclick="unmarkDifficult('${encodeURIComponent(w.es)}')">Убрать из сложных</button>` : `<button class="small-btn" onclick="markDifficultAndRerender('${encodeURIComponent(w.es)}')">Добавить в сложные</button>`}
     </div>
   </div>`;
+}
+async function generateAiAssocForList(esEnc, btn) {
+  const es = decodeURIComponent(esEnc);
+  const w = WORDS_DATA.find((x) => x.es === es);
+  if (!w) return;
+  const oldLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "⏳ Генерирую...";
+  try {
+    await generateAiAssociationFor(w.es, w.ru);
+    renderAssocList();
+  } catch (e) {
+    alert("Не получилось сгенерировать ассоциацию: " + e.message);
+    btn.disabled = false;
+    btn.textContent = oldLabel;
+  }
 }
 function copyWordToClipboard(esEnc, btn) {
   const es = decodeURIComponent(esEnc);
@@ -640,6 +687,21 @@ function highlightUnknown(text) {
 }
 
 function loadAiKey() { return (localStorage.getItem(LS_AI_KEY) || "").trim(); }
+async function callGeminiRaw(prompt) {
+  const key = loadAiKey();
+  if (!key) throw new Error("Нет сохранённого ключа ИИ.");
+  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+  });
+  if (!resp.ok) {
+    const errText = await resp.text().catch(() => "");
+    throw new Error(`Сервер ответил ошибкой ${resp.status}. ${errText.slice(0, 200)}`);
+  }
+  const data = await resp.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+}
 function saveAiKey() {
   const input = document.getElementById("ai-key-input");
   const key = input.value.trim();
@@ -689,17 +751,7 @@ async function generateNewText() {
 Ответь СТРОГО в формате JSON без markdown-разметки и пояснений, ровно так:
 {"title": "короткое название на русском", "es": "текст на испанском", "ru": "точный перевод текста на русский"}`;
   try {
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-    });
-    if (!resp.ok) {
-      const errText = await resp.text().catch(() => "");
-      throw new Error(`Сервер ответил ошибкой ${resp.status}. ${errText.slice(0, 200)}`);
-    }
-    const data = await resp.json();
-    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const raw = await callGeminiRaw(prompt);
     const clean = raw.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
     if (!parsed.es || !parsed.ru) throw new Error("Не удалось разобрать ответ ИИ.");
