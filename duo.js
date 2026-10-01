@@ -242,8 +242,21 @@ const DUO_LOG = [
       { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "Индивидуальные уроки, урок 2 из 3", correct: 15, total: 15, perfect: true },
       { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "Индивидуальные уроки, урок 3 из 3", correct: 15, total: 15, perfect: true },
       { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "История «Гибкий план путешествия»", perfect: true },
+      { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "Радио «Письмо от директора» (проходила сама)" },
+      { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "Повторение раздела, урок 1 из 3", correct: 15, total: 15, perfect: true },
+      { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "Повторение раздела, урок 2 из 3 (1 ошибка: «la estampilla» вместо «estampilla»)", perfect: false },
+      { skill: "Отправляйте и получайте почту", module: "Модуль 3, Раздел 19", lessonNum: "Повторение раздела, урок 3 из 3", correct: 15, total: 15, perfect: true },
     ],
-    newWords: ["responder", "viaje", "veintidós", "perdida"],
+    newWords: [
+      "perezoso", "quedarse", "ducharse", "levantarse", "cepillarse", "lavarse", "y media", "por supuesto",
+      "responder", "mensaje", "pescar", "invierno", "campamento", "optimista", "Alemania", "pareja", "romántico",
+      "qué mala suerte", "perdida", "tour", "magnífico", "durazno", "yogur", "mayonesa",
+      "viaje", "veintidós", "lugar", "ciudad", "norte", "sur", "plan", "increíble", "horrible",
+      "una vez", "al día", "por semana", "en serio", "ahora mismo",
+      "buzón", "carta", "postal", "sobre", "paquete", "estampilla", "destinataria", "empleada",
+      "código postal", "dirección", "equivocado", "caja", "regalo", "cumpleaños", "poema",
+      "enamorado", "contento", "felicidad", "lamentablemente", "Estados Unidos", "recibir", "enviar",
+    ],
     rules: [
       {
         title: "Возвратные глаголы: местоимение (me/te/se/nos) стоит ПЕРЕД глаголом, а «no» — перед местоимением",
@@ -266,6 +279,51 @@ const DUO_LOG = [
         title: "«por la tarde» — не только «днём», но и «до вечера / во второй половине дня»",
         explanation:
           "«Yo me quedo en la oficina por la tarde» Duolingo перевёл как «Я остаюсь в офисе до вечера». por la mañana / por la tarde / por la noche — это «утром / во второй половине дня / вечером-ночью», и в русском переводе иногда удобнее «до вечера», когда речь о том, сколько времени где-то проводишь.",
+      },
+      {
+        title: "В задании «Напишите „X“ на испанском» с картинкой — одно слово, без артикля",
+        explanation:
+          "На картинку с маркой я написала «la estampilla» — Duolingo не принял, правильный ответ был просто «estampilla». А в похожем задании «письмо» ответ «la carta» он принял — так что надёжнее всегда писать слово без артикля.\n\n" +
+          "Как применять: в заданиях-карточках «Напишите „…“ на испанском» пиши только само слово (estampilla, carta, sobre), без la/el.",
+      },
+      {
+        title: "responder: кому отвечаешь — косвенное местоимение (les/nos/me), на что — прямое дополнение без «a»",
+        explanation:
+          "В русском «отвечать КОМУ-ТО НА письмо», а в испанском «responder (le/les) la carta» — предлог «на» не переводится:\n" +
+          "• Yo les respondo las cartas — Я отвечаю им на письма\n" +
+          "• ¡Nunca nos responden las cartas! — Они никогда не отвечают нам на письма!\n" +
+          "• Les voy a responder esta carta — Я собираюсь ответить им на это письмо\n\n" +
+          "Местоимение les/nos/me стоит ПЕРЕД спрягаемым глаголом (а с конструкцией voy a + инфинитив — либо перед voy, либо слитно: voy a responderles). «Yo» в начале — для акцента, и оно идёт перед les: «yo les respondo», а не «les yo respondo».",
+      },
+      {
+        title: "«les» — это и «им», и «вам» (ustedes): смотри на контекст",
+        explanation:
+          "Косвенное местоимение les относится и к ellos/ellas («им»), и к ustedes («вам», вежливо или во множественном числе). Поэтому одна и та же форма переводится по-разному:\n" +
+          "• Lamentablemente, les envían las postales a la dirección equivocada — К сожалению, ВАМ отправляют открытки на неправильный адрес\n" +
+          "• Ah, les compran los regalos en Estados Unidos — Ах, ИМ покупают подарки в США\n" +
+          "• ¿Luis les escribe cartas cuando viaja? — Луис пишет ВАМ письма, когда путешествует?\n\n" +
+          "Как выбрать les среди вариантов (yo / tú / les): если глагол уже стоит в форме 3-го лица мн. ч. (envían, compran) или 3-го лица ед. ч. с другим подлежащим (Luis escribe), то yo и tú туда не подходят — нужен именно les.",
+      },
+      {
+        title: "Как часто: una vez al día / una vez por semana / todos los días",
+        explanation:
+          "Частота в испанском строится так:\n" +
+          "• una vez al día — раз в день (можно и una vez por día)\n" +
+          "• una vez por semana — раз в неделю\n" +
+          "• todos los días / todas las semanas — каждый день / каждую неделю (артикль обязателен!)\n" +
+          "• cada día — каждый день (без артикля)\n" +
+          "• a menudo — часто\n\n" +
+          "Примеры из уроков: «Nos levantamos a las seis de la mañana todos los días», «Una vez por semana, Pablo me escribe un poema romántico», «Ana me escribe una postal todas las semanas».",
+      },
+      {
+        title: "В истории встретилось прошедшее время: viajé, fue, escribí",
+        explanation:
+          "В истории «Гибкий план путешествия» Лин рассказывает о прошлой поездке в прошедшем времени (pretérito):\n" +
+          "• Yo viajé sin plan una vez — Я однажды путешествовала без плана (viajar → viajé)\n" +
+          "• Fue increíble — Это было невероятно (ser → fue)\n" +
+          "• ¿Dónde fue? — Где это было?\n" +
+          "• No escribí nada — Я ничего не записала (escribir → escribí)\n\n" +
+          "Пока это только на узнавание: окончание -é у глаголов на -ar и -í у глаголов на -er/-ir в 1-м лице («я») — признак законченного действия в прошлом. Ударение на последнем слоге важно: viajé (я путешествовала) ≠ viaje (путешествие).",
       },
     ],
   },
